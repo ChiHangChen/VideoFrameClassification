@@ -49,7 +49,7 @@ class mainProgram(QMainWindow, Ui_MainWindow):
         self.current_frame = 0
         self.images_list = []
         self.class_list = []
-        
+        self.done_frame_list = set([])
     # If user resize mainwindow, then keep the button position    
     def resizeEvent(self, event):
         for i in [self.img_qlabel, self.text_qlabel, self.scroll, self.pathButton, self.prevButton, self.saveButton]:
@@ -114,7 +114,7 @@ class mainProgram(QMainWindow, Ui_MainWindow):
             if ret:
                 self.update_image(frame)
                 self.images_list.append(frame)
-                
+                self.done_frame_list.add(self.current_frame)
     # this function is for update current window to the next image after user click classification button
     def update_image(self, bbox):
         qImg = array2qimage(bbox[...,::-1])
@@ -144,14 +144,19 @@ class mainProgram(QMainWindow, Ui_MainWindow):
                     self.new_class.append(keymap[event.key()])
                     self.current_frame += 1
                     
-                    # If to the end, save and close program
-                    ret, frame = self.cap.read()
-                    if not ret:
-                        self.to_the_end = True
-                        self.save()
-                    else:
+                    if self.current_frame in self.done_frame_list:
+                        frame = self.images_list[self.current_frame]
                         self.update_image(frame)
-                        self.images_list.append(frame)
+                    else:
+                        # If to the end, save and close program
+                        ret, frame = self.cap.read()
+                        if not ret:
+                            self.to_the_end = True
+                            self.save()
+                        else:
+                            self.update_image(frame)
+                            self.images_list.append(frame)
+                            self.done_frame_list.add(self.current_frame)
             else:
                 QMessageBox.information(self,"Warning", "Can not press special keys!")
                 
@@ -163,6 +168,7 @@ class mainProgram(QMainWindow, Ui_MainWindow):
         else:
             self.current_frame -= 1
             self.new_class = self.new_class[:-1]
+            # self.done_frame_list.remove(self.current_frame)
             
             frame = self.images_list[self.current_frame]
             self.update_image(frame)
