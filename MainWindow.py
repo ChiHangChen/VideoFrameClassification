@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         _translate = QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Quick Classification"))
         self.img_qlabel.setText(_translate("MainWindow", "Image Display"))
-        self.text_qlabel.setText(_translate("MainWindow", " Please select a folder"))
+        self.text_qlabel.setText(_translate("MainWindow", " Please select a video"))
         self.pathButton.setText(_translate("MainWindow", "Open Video"))
         self.prevButton.setText(_translate("MainWindow", "Previous"))
         self.saveButton.setText(_translate("MainWindow", "Save"))

@@ -1,0 +1,4 @@
+build
+dist
+pyinstaller.txt
+run.bat
