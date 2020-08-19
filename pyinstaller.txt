@@ -1,0 +1,3 @@
+activate pyinstaller-env
+cd C:\Users\%USERNAME%\Documents\GitHub\VideoFrameClassification
+pyinstaller VideoFrameClassification.spec
