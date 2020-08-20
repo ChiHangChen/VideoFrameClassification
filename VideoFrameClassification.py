@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QFileDialog
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt, pyqtSignal, QEvent
 from sys import argv, exit
-from numpy import array as nparray
 from PIL.Image import open as imopen
 from PIL.Image import fromarray as imfromarray
 from win32gui import GetWindowText, GetForegroundWindow
@@ -20,7 +19,7 @@ from os import path as ospath
 from utils import resize_widget, resize_font, resize_icon
 from MainWindow import resource_path, Ui_MainWindow, progressWindow
 from glob import glob
-import cv2
+from cv2 import VideoCapture
 import json
 
 keymap = {}
@@ -66,15 +65,7 @@ class mainProgram(QMainWindow, Ui_MainWindow):
             pass
             
         QMainWindow.resizeEvent(self, event)
-        
-    # this function is for reading image using pillow package
-    def read_img(self, path):
-        if not ospath.exists(path):
-            QMessageBox.information(self, "Warning", f"No image found : {path}")
-            exit(app.exec_())
-        else:
-            return nparray(imopen(path))
-    # this function is for merging clipped bounding box which is already classified by folder back to labelme json format        
+               
 
     # this function is for saveing current classification progress
     def save(self):
@@ -109,7 +100,7 @@ class mainProgram(QMainWindow, Ui_MainWindow):
             self.video_path = path
             self.current_frame = 0
             self.new_class = ['None']
-            self.cap = cv2.VideoCapture(self.video_path)
+            self.cap = VideoCapture(self.video_path)
             ret, frame = self.cap.read()
             if ret:
                 self.update_image(frame)
