@@ -4,3 +4,5 @@ pyinstaller.txt
 run.bat
 video.avi
 video.txt
+.Rhistory
+__pycache__

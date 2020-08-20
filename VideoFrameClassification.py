@@ -17,7 +17,7 @@ from qimage2ndarray import array2qimage
 from shutil import move
 from os import makedirs, chdir, getcwd
 from os import path as ospath
-from utils import read_labelme_json, return_bboxImg, dump_json, resize_widget, resize_font, resize_icon
+from utils import resize_widget, resize_font, resize_icon
 from MainWindow import resource_path, Ui_MainWindow, progressWindow
 from glob import glob
 import cv2
