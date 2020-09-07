@@ -98,8 +98,11 @@ class mainProgram(QMainWindow, Ui_MainWindow):
         else:
             self.path_click = True
             self.video_path = path
-            self.current_frame = 0
             self.new_class = ['None']
+            self.current_frame = 0
+            self.images_list = []
+            self.class_list = []
+            self.done_frame_list = set([])
             self.cap = VideoCapture(self.video_path)
             ret, frame = self.cap.read()
             if ret:

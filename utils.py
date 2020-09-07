@@ -69,7 +69,7 @@ def resize_widget(widget,current_window_width,current_window_height,fix_height =
         ))
 
 def resize_font(widget,current_window_width,current_window_height):
-    widget.setFont(QFont("Roman times",int(12*current_window_width/default_width),QFont.Bold))
+    widget.setFont(QFont("Roman times",int(8*current_window_width/default_width),QFont.Bold))
 
 def resize_icon(widget,current_window_width,current_window_height):
     new_shape = int(40*current_window_width/default_width)
