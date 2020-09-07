@@ -84,7 +84,7 @@ class mainProgram(QMainWindow, Ui_MainWindow):
                 f.writelines(output)
             if self.to_the_end:
                 QMessageBox.information(self, "Warning", "Job Done!")
-                exit(app.exec_())
+                # exit(app.exec_())
             else:
                 QMessageBox.information(self, "Warning", "Label saved!")
             
