@@ -59,8 +59,9 @@ class mainProgram(QMainWindow, Ui_MainWindow):
         try:
             frame = self.frame_info[self.current_frame][0]
             self.update_image(frame)
-        except:
+        except Exception as e:
             print("Resize Error")
+            print(e)
             pass
             
         QMainWindow.resizeEvent(self, event)
@@ -74,7 +75,7 @@ class mainProgram(QMainWindow, Ui_MainWindow):
         # elif len(self.new_class)==0:
         #     QMessageBox.information(self, "Warning", "No classes need to be saved!")
         else:
-            output = [str(k)+" "+str(v[1])+"\n" for k,v in self.frame_info.items()]
+            output = [str(k)+" "+str(self.frame_info[k][1])+"\n" for k in range(self.current_frame)]
             output[-1] = output[-1].replace("\n","")
             basename = ospath.basename(self.video_path)
             folder = ospath.dirname(self.video_path)
