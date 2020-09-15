@@ -21,6 +21,7 @@ from MainWindow import resource_path, Ui_MainWindow, progressWindow
 from glob import glob
 from cv2 import VideoCapture
 import json
+from collections import defaultdict
 
 keymap = {}
 for key, value in vars(Qt).items():
@@ -45,10 +46,7 @@ class mainProgram(QMainWindow, Ui_MainWindow):
         self.setStyleSheet("QMessageBox { messagebox-text-interaction-flags: 5; }")
         self.path_click=False
         self.video_path = 'None'
-        self.current_frame = 0
-        self.images_list = []
-        self.class_list = []
-        self.done_frame_list = set([])
+        
     # If user resize mainwindow, then keep the button position    
     def resizeEvent(self, event):
         for i in [self.img_qlabel, self.text_qlabel, self.scroll, self.pathButton, self.prevButton, self.saveButton]:
@@ -59,9 +57,10 @@ class mainProgram(QMainWindow, Ui_MainWindow):
             resize_icon(i, self.rect().width(), self.rect().height())
         
         try:
-            frame = self.images_list[-1]
+            frame = self.frame_info[self.current_frame][0]
             self.update_image(frame)
         except:
+            print("Resize Error")
             pass
             
         QMainWindow.resizeEvent(self, event)
@@ -72,10 +71,10 @@ class mainProgram(QMainWindow, Ui_MainWindow):
         print("存檔中...")
         if not self.path_click:
             QMessageBox.information(self, "Warning", "Please select a video first!")
-        elif len(self.new_class)==0:
-            QMessageBox.information(self, "Warning", "No classes need to be saved!")
+        # elif len(self.new_class)==0:
+        #     QMessageBox.information(self, "Warning", "No classes need to be saved!")
         else:
-            output = [str(k)+" "+str(v)+"\n" for k,v in enumerate(self.new_class[1:])]
+            output = [str(k)+" "+str(v[1])+"\n" for k,v in self.frame_info.items()]
             output[-1] = output[-1].replace("\n","")
             basename = ospath.basename(self.video_path)
             folder = ospath.dirname(self.video_path)
@@ -84,7 +83,7 @@ class mainProgram(QMainWindow, Ui_MainWindow):
                 f.writelines(output)
             if self.to_the_end:
                 QMessageBox.information(self, "Warning", "Job Done!")
-                # exit(app.exec_())
+                print(f"\n Current frame : {self.current_frame}")
             else:
                 QMessageBox.information(self, "Warning", "Label saved!")
             
@@ -98,17 +97,13 @@ class mainProgram(QMainWindow, Ui_MainWindow):
         else:
             self.path_click = True
             self.video_path = path
-            self.new_class = ['None']
             self.current_frame = 0
-            self.images_list = []
-            self.class_list = []
-            self.done_frame_list = set([])
+            self.frame_info = defaultdict(list)
             self.cap = VideoCapture(self.video_path)
             ret, frame = self.cap.read()
             if ret:
                 self.update_image(frame)
-                self.images_list.append(frame)
-                self.done_frame_list.add(self.current_frame)
+                self.frame_info[self.current_frame] = [frame, None]
     # this function is for update current window to the next image after user click classification button
     def update_image(self, bbox):
         qImg = array2qimage(bbox[...,::-1])
@@ -118,14 +113,16 @@ class mainProgram(QMainWindow, Ui_MainWindow):
             self.img_qlabel.setPixmap(pixmap)
             text = ""
             text += f" File name : {self.video_path}"
-            text += f"\n Current frame ( starts with 0 ) : {self.current_frame}"
-            text += f"\n Previous frame ({self.current_frame-1}) class : {self.new_class[-1]}"
+            text += f"\n Current frame : {self.current_frame}"
+            if self.current_frame >= 1:
+                text += f"\n Previous frame ({self.current_frame-1}) class : {self.frame_info[self.current_frame-1][1]}"
             self.text_qlabel.setText(text)
     
     # when user press any keys will trigger this function        
     def keyPressEvent(self, event):
         super(mainProgram, self).keyPressEvent(event)
-        self.keyPressed.emit(event) 
+        self.keyPressed.emit(event)
+        print(f"\n Current frame : {self.current_frame}")
         
     # when user press any keys will trigger this function           
     def on_key(self, event):
@@ -135,22 +132,22 @@ class mainProgram(QMainWindow, Ui_MainWindow):
                 if keymap[event.key()]=='Backspace':
                     self.prev_image()
                 else:
-                    self.new_class.append(keymap[event.key()])
+                    self.frame_info[self.current_frame][1] = keymap[event.key()]
+                    # To the next frame
                     self.current_frame += 1
-                    
-                    if self.current_frame in self.done_frame_list:
-                        frame = self.images_list[self.current_frame]
+                    if self.current_frame in self.frame_info:
+                        frame = self.frame_info[self.current_frame][0]
                         self.update_image(frame)
                     else:
                         # If to the end, save and close program
                         ret, frame = self.cap.read()
                         if not ret:
                             self.to_the_end = True
+                            self.current_frame -= 1
                             self.save()
                         else:
                             self.update_image(frame)
-                            self.images_list.append(frame)
-                            self.done_frame_list.add(self.current_frame)
+                            self.frame_info[self.current_frame] = [frame, None]
             else:
                 QMessageBox.information(self,"Warning", "Can not press special keys!")
                 
@@ -161,10 +158,8 @@ class mainProgram(QMainWindow, Ui_MainWindow):
             QMessageBox.information(self,"Warning", "No previous image!")
         else:
             self.current_frame -= 1
-            self.new_class = self.new_class[:-1]
-            # self.done_frame_list.remove(self.current_frame)
             
-            frame = self.images_list[self.current_frame]
+            frame = self.frame_info[self.current_frame][0]
             self.update_image(frame)
         
         
