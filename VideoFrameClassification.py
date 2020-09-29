@@ -75,9 +75,9 @@ class mainProgram(QMainWindow, Ui_MainWindow):
         # elif len(self.new_class)==0:
         #     QMessageBox.information(self, "Warning", "No classes need to be saved!")
         else:
-            output = [str(k)+" "+str(self.frame_info[k][1])+"\n" for k in range(self.current_frame)]
-            output[-1] = output[-1].replace("\n","")
             basename = ospath.basename(self.video_path)
+            output = ["{:05d}".format(k)+" "+str(self.frame_info[k][1])+" "+basename+"\n" for k in range(self.current_frame)]
+            output[-1] = output[-1].replace("\n","")
             folder = ospath.dirname(self.video_path)
             labelFileName = basename.split(".")[0]+".txt"
             with open(ospath.join(folder,labelFileName),"w") as f:

@@ -1,6 +1,6 @@
 # **Introduction**
 
-![version](https://img.shields.io/badge/version-0.2.0-blue)
+![version](https://img.shields.io/badge/version-0.2.1-blue)
 
 A labeling tool for quick video frames classification.
 
